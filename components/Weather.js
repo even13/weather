@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import { weatherConditions } from '../utils/WeatherConditions';
 
-const Weather = ({ weather, temperature }) => {
+const Weather = ({ city, weather, temperature }) => {
   if (weather != null) {
     return (
       <View
@@ -19,7 +19,7 @@ const Weather = ({ weather, temperature }) => {
             name={weatherConditions[weather].icon}
             color={'#fff'}
           />
-          <Text style={styles.tempText}>{temperature}˚</Text>
+          <Text style={styles.tempText}>Currently {temperature}˚ in {city}</Text>
         </View>
         <View style={styles.bodyContainer}>
           <Text style={styles.title}>{weatherConditions[weather].title}</Text>
