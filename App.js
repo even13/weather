@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, Animated } from 'react-native';
-
+import {
+  StyleSheet, Text, View,
+} from 'react-native';
+import { Input, Button } from 'react-native-elements';
 import { API_KEY } from './utils/WeatherAPIKey';
 
 import Weather from './components/Weather';
@@ -9,17 +11,15 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
       temperature: 0,
       weatherCondition: null,
       city: null,
       cityName: '',
-      error: null
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-  };
+  }
 
   // componentDidMount() {
   //   navigator.geolocation.getCurrentPosition(
@@ -34,22 +34,19 @@ export default class App extends React.Component {
   //   );
   // }
 
-  displayWeather(city) {
+  displayWeather(cityName) {
     fetch(
-      `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${API_KEY}&units=metric`
+      `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&APPID=${API_KEY}&units=metric`,
     )
-      .then(res => res.json())
-      .then(json => {
-        console.log(json)
+      .then((res) => res.json())
+      .then((json) => {
+        // console.log(json);
         this.setState({
-          city: true,
-          cityName: city,
           temperature: json.main.temp,
           weatherCondition: json.weather[0].main,
-          isLoading: false
-        })
-      })
-    }
+        });
+      });
+  }
 
   // fetchWeather(lat, lon) {
   //   fetch(
@@ -69,70 +66,51 @@ export default class App extends React.Component {
   handleChange(event) {
     this.setState({
       city: event.target.value,
-      cityName: event.target.value
     });
-    console.log(this.state)
   }
 
   handleSubmit(event) {
-    this.setState({
-      city: event.target.value,
-      cityName: event.target.value
-    });
-    console.log(this.state)
+    const cityState = (this.state.city).toUpperCase();
+    this.state.cityName = cityState;
     event.preventDefault();
-    var city = this.state.city;
-    this.displayWeather(city)
+    this.displayWeather(this.state.cityName);
   }
 
   render() {
-    const { isLoading, weatherCondition, temperature, city, cityName } = this.state;
+    const {
+      weatherCondition, temperature, city, cityName,
+    } = this.state;
     return (
       <View style={styles.container}>
-        {city ? (
-          <div>
-            <div>
-              <form onSubmit={this.handleSubmit}>
-                <label>
-                  City:
-                  <input type="text" placeholder='Enter city' onChange={this.handleChange} />
-                </label>
-                <input type="submit" value="Submit" />
-              </form>
-            </div>
-            <div>
-              <Weather city={cityName} weather={weatherCondition} temperature={temperature} />
-            </div>
-          </div>
-        ) : (
-          <div>
-            <form onSubmit={this.handleSubmit}>
-              <label>
-                City:
-                <input type="text" placeholder='Enter city' onChange={this.handleChange} />
-              </label>
-              <input type="submit" value="Submit" />
-            </form>
-          </div>
-        )}
+        <Text style={styles.label}>
+          <Text>Check the weather in:</Text>
+          <Input inputStyle={styles.input} type="text" placeholder="Enter city" onChange={this.handleChange} required />
+          <Button raised title="Go" onPress={this.handleSubmit} />
+        </Text>
+        <Text>
+          {!!this.state.cityName && <Weather cityName={cityName} weather={weatherCondition} temperature={temperature} /> }
+        </Text>
       </View>
-
-      );
-    }
+    );
   }
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff'
-  },
-  loadingContainer: {
-    flex: 1,
+    backgroundColor: '#001f3f',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFDE4'
   },
-  loadingText: {
-    fontSize: 30
-  }
+  label: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+    fontSize: 30,
+    color: '#fff',
+  },
+  input: {
+    color: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
